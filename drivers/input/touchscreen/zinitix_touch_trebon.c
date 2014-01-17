@@ -1577,13 +1577,6 @@ force_upgrade:
 
 #if	USE_HW_CALIBRATION
 	if (zinitix_bit_test(chip_eeprom_info, 0)) { /* hw calibration bit*/
-		if (touch_dev->cap_info.chip_int_mask != 0)
-			if (ts_write_reg(touch_dev->client,
-				ZINITIX_INT_ENABLE_FLAG,
-				touch_dev->cap_info.chip_int_mask)
-				!= I2C_SUCCESS)
-				goto fail_init;
-
 		 /* h/w calibration */
 		if (ts_write_reg(touch_dev->client,
 			ZINITIX_TOUCH_MODE, 0x07) != I2C_SUCCESS)
@@ -1597,13 +1590,6 @@ force_upgrade:
 		usleep(1*1000);
 		ts_write_cmd(touch_dev->client,
 			ZINITIX_CLEAR_INT_STATUS_CMD);
-		msleep(100);
-		ts_write_cmd(touch_dev->client,
-			ZINITIX_CLEAR_INT_STATUS_CMD);
-		msleep(100);
-			ts_write_cmd(touch_dev->client,
-			ZINITIX_CLEAR_INT_STATUS_CMD);
-		msleep(100);
 		/* wait for h/w calibration*/
 		hw_cal_cnt = 0;
 		do {
@@ -1627,6 +1613,12 @@ force_upgrade:
 		if (ts_write_reg(touch_dev->client,
 			ZINITIX_TOUCH_MODE, TOUCH_MODE) != I2C_SUCCESS)
 			goto fail_init;
+		if (touch_dev->cap_info.chip_int_mask != 0)
+			if (ts_write_reg(touch_dev->client,
+				ZINITIX_INT_ENABLE_FLAG,
+				touch_dev->cap_info.chip_int_mask)
+				!= I2C_SUCCESS)
+				goto fail_init;
 
 		usleep(10*1000);
 		if (ts_write_cmd(touch_dev->client,
